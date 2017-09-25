@@ -1,0 +1,51 @@
+#!/bin/bash
+
+USER=`whoami`
+TIMESTAMP=`date +"%a, %d %b %Y %T %z"`
+if [ -z ${SERVER_NAME+x} ]; then
+    SERVER_NAME="www.webdev.dock"
+fi
+if [ -z ${LOG_SENDMAIL+x} ]; then
+    LOG_SENDMAIL="/var/www/sendmail.log"
+fi
+echo "220 $SERVER_NAME ESMTP Sendmail 8.14.4/8.14.4/Submit; $TIMESTAMP; (No UCE/UBE)"
+read SENDMAIL_HELO
+echo $SENDMAIL_HELO >> $LOG_SENDMAIL
+echo "250 $SERVER_NAME Hello ${USER}@localhost, get lost"
+
+DONE=false
+until $DONE ;do
+  read -r SENDMAIL_LINE || DONE=true
+  echo $SENDMAIL_LINE >> $LOG_SENDMAIL
+  SENDMAIL_CMD=`echo -n "$SENDMAIL_LINE" | sed -e "s|\([^:]*\): \([^\r\n]*\)|\1|" | tr -d '\r\n'`
+  SENDMAIL_PARAM=`echo -n "$SENDMAIL_LINE" | sed -e "s|\([^:]*\): \([^\r\n]*\)|\2|" | tr -d '\r\n'`
+  if [ "$SENDMAIL_CMD" == "MAIL FROM" ]; then
+    # Sender
+    echo "250 2.1.0 ${SENDMAIL_PARAM}... Sender ok"
+    echo "> 250 2.1.0 ${SENDMAIL_PARAM}... Sender ok" >> $LOG_SENDMAIL
+  elif [ "$SENDMAIL_CMD" == "RCPT TO" ]; then
+    # Recipient
+    echo "250 2.1.5 ${SENDMAIL_PARAM}... Recipient ok"
+    echo "> 250 2.1.5 ${SENDMAIL_PARAM}... Recipient ok" >> $LOG_SENDMAIL
+  elif [ "$SENDMAIL_CMD" == "DATA" ]; then
+    # Mail data
+    echo "354 Enter mail, end with \".\" on a line by itself"
+    echo "> 354 Enter mail, end with \".\" on a line by itself" >> $LOG_SENDMAIL
+    DATADONE=false
+    until $DATADONE ;do
+      read -r DATA_LINE || DATADONE=true
+      DATA_LINE=`echo -n "$DATA_LINE" | tr -d '\r\n'`
+      if [ "$DATA_LINE" == "." ]; then
+        DATADONE=true
+      else
+        echo "DATA: $DATA_LINE" >> $LOG_SENDMAIL
+      fi
+    done
+    echo "250 2.0.0 xxxxxxxxxxxxxx Message accepted for delivery"
+    echo "> 250 2.0.0 xxxxxxxxxxxxxx Message accepted for delivery" >> $LOG_SENDMAIL
+  else
+    echo "500 5.5.1 Command unrecognized: \"${SENDMAIL_CMD}\""
+    echo "> 500 5.5.1 Command unrecognized: \"${SENDMAIL_CMD}\"" >> $LOG_SENDMAIL
+  fi
+
+done
