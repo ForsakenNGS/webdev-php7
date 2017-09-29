@@ -10,9 +10,10 @@ You can optionally provide a user- and group-id to match with your host user for
 
 - **APACHE_RUN_USER** The user name that apache will run with *(default: "www-data")*
 - **APACHE_RUN_GROUP** The group name that apache will run with *(default: "www-data")*
-- **APACHE_RUN_USER_HOME** The home directory of the apache user *(default: "/var/www" or "/home/$APACHE_RUN_USER")*
 - **APACHE_RUN_UID** The user id that will be used for creating the user *(optional)*
 - **APACHE_RUN_GID** The group id that will be used for creating the group *(optional)*
+- **APACHE_RUN_USER_HOME** The home directory of the apache user *(default: "/var/www" or "/home/$APACHE_RUN_USER")*
+- **APACHE_RUN_USER_SSH_DIR** A directory which will be moved into the home directory as ".ssh" *(optional)*
 
 #### VirtualHost entry
 

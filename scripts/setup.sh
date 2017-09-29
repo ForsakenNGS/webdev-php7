@@ -111,6 +111,16 @@ if [ ! -d "$APACHE_RUN_USER_HOME" ]; then
     else
         useradd -d $APACHE_RUN_USER_HOME -g $APACHE_RUN_GID -u $APACHE_RUN_UID -G $APACHE_RUN_GROUP $APACHE_RUN_USER
     fi
+    if [ ! -z ${APACHE_RUN_USER_SSH_DIR+x} ]; then
+        # Add ssh directory to user home
+        mv $APACHE_RUN_USER_SSH_DIR $APACHE_RUN_USER_HOME/.ssh
+        # Ensure correct permissions for ssh key
+        if [ -d $APACHE_RUN_USER_HOME/.ssh ]; then
+            chown -R $APACHE_RUN_USER:$APACHE_RUN_GROUP $APACHE_RUN_USER_HOME/.ssh
+            chmod 0700 $APACHE_RUN_USER_HOME/.ssh
+            chmod 0600 $APACHE_RUN_USER_HOME/.ssh/*
+        fi
+    fi
     # Apply correct permissions to the home directory
     chown -R $APACHE_RUN_USER:$APACHE_RUN_GROUP $APACHE_RUN_USER_HOME
 fi
