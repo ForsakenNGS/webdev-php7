@@ -159,6 +159,7 @@ chown -R $APACHE_RUN_USER:$APACHE_RUN_GROUP $LOG_DIRECTORY
 chown -R $APACHE_RUN_USER:$APACHE_RUN_GROUP $DIRECTORY
 
 # Start chronjob
+echo "EXTRA_OPTS='-l'" >> /etc/default/cron
 /etc/init.d/cron start
 
 # Start apache
