@@ -45,4 +45,4 @@ RUN chmod +x /usr/local/bin/apache2-foreground
 EXPOSE 80
 EXPOSE 443
 
-CMD ["tail -f /var/log/apache2/output.log"]
+CMD ["/usr/bin/tail", "-F", "/var/log/apache2/output.log"]
