@@ -17,6 +17,11 @@ RUN pecl install mcrypt-1.0.1
 RUN docker-php-ext-enable mcrypt
 RUN docker-php-ext-install -j4 pdo_mysql gd xml zip curl intl
 
+# Install redis extension
+RUN pecl install -o -f redis \
+  &&  rm -rf /tmp/pear \
+  &&  docker-php-ext-enable redis
+
 # Enable apache modules
 RUN a2enmod rewrite
 
