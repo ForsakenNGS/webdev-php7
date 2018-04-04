@@ -48,7 +48,7 @@ if [ -z ${LOG_SENDMAIL+x} ]; then
     LOG_SENDMAIL="$LOG_DIRECTORY/sendmail.log"
 fi
 if [ -z ${DIRECTORY_OPTIONS+x} ]; then
-    DIRECTORY_OPTIONS="-Indexes +Includes +FollowSymLinks"
+    DIRECTORY_OPTIONS="Indexes Includes FollowSymLinks MultiViews"
 fi
 if [ -z ${DIRECTORY_EXTRA+x} ]; then
     DIRECTORY_EXTRA="AllowOverride All"
