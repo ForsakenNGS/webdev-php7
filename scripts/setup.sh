@@ -60,6 +60,7 @@ read -d '' DIRECTORY_PERM_DEFAULT <<"EOF"
     #
     Order allow,deny
     Allow from all
+    Require all granted
 EOF
 if [ -z ${DIRECTORY_PERM+x} ]; then
     DIRECTORY_PERM=$DIRECTORY_PERM_DEFAULT
