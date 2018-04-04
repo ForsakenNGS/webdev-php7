@@ -53,7 +53,7 @@ fi
 if [ -z ${DIRECTORY_EXTRA+x} ]; then
     DIRECTORY_EXTRA="AllowOverride All"
 fi
-DIRECTORY_EXTRA=${DIRECTORY_PERM//$'\n'/\\n}
+DIRECTORY_EXTRA=${DIRECTORY_EXTRA//$'\n'/\\n}
 read -d '' DIRECTORY_PERM_DEFAULT <<"EOF"
     #
     # Controls who can get stuff from this server.
