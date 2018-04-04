@@ -39,16 +39,16 @@ if [ -z ${LOG_DIRECTORY+x} ]; then
     fi
 fi
 if [ -z ${LOG_ERROR+x} ]; then
-    LOG_ERROR="/var/log/apache2/error.log"
+    LOG_ERROR="$LOG_DIRECTORY/error.log"
 fi
 if [ -z ${LOG_CUSTOM+x} ]; then
-    LOG_CUSTOM="/var/log/apache2/access.log combined"
+    LOG_CUSTOM="$LOG_DIRECTORY/access.log combined"
 fi
 if [ -z ${LOG_SENDMAIL+x} ]; then
     LOG_SENDMAIL="$LOG_DIRECTORY/sendmail.log"
 fi
 if [ -z ${DIRECTORY_OPTIONS+x} ]; then
-    DIRECTORY_OPTIONS="Indexes Includes FollowSymLinks"
+    DIRECTORY_OPTIONS="-Indexes +Includes +FollowSymLinks"
 fi
 if [ -z ${DIRECTORY_EXTRA+x} ]; then
     DIRECTORY_EXTRA="AllowOverride All"
