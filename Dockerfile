@@ -38,13 +38,17 @@ RUN chmod +x /usr/sbin/sendmail
 COPY scripts/setup.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/setup.sh
 
+# Add entrypoint script
+COPY scripts/entrypoint.sh /usr/local/bin
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 # Volumes
 VOLUME /etc/apache2/sites-available
 VOLUME /var/www
 
 # -----------------------------------------
 
-ENTRYPOINT ["setup.sh"]
+ENTRYPOINT ["entrypoint.sh"]
 
 RUN chmod +x /usr/local/bin/apache2-foreground
 
