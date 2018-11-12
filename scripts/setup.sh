@@ -107,9 +107,13 @@ do
     CHECK_USER_ID=`stat -c '%u' ${VOLUME_PATH}`
     CHECK_GROUP_ID=`stat -c '%g' ${VOLUME_PATH}`
     # Skip volumes that are owned by root
-    if [ "$CHECK_USER_ID" != "0" ] && [ "$CHECK_USER_ID" != "$APACHE_RUN_UID_DEFAULT" ]; then
-      APACHE_RUN_UID="$CHECK_USER_ID"
-      APACHE_RUN_GID="$CHECK_GROUP_ID"
+    if [ "$CHECK_USER_ID" != "0" ] && [ "$CHECK_GROUP_ID" != "0" ]; then
+      if [ "$CHECK_USER_ID" != "$APACHE_RUN_UID_DEFAULT" ]; then
+        APACHE_RUN_UID="$CHECK_USER_ID"
+        APACHE_RUN_GID="$CHECK_GROUP_ID"
+      elif [ "$CHECK_USER_ID" != "$APACHE_RUN_GID_DEFAULT" ];
+        APACHE_RUN_GID="$CHECK_GROUP_ID"
+      fi
     fi
   fi
 done
