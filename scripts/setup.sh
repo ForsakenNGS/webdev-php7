@@ -111,7 +111,7 @@ do
       if [ "$CHECK_USER_ID" != "$APACHE_RUN_UID_DEFAULT" ]; then
         APACHE_RUN_UID="$CHECK_USER_ID"
         APACHE_RUN_GID="$CHECK_GROUP_ID"
-      elif [ "$CHECK_USER_ID" != "$APACHE_RUN_GID_DEFAULT" ];
+      elif [ "$CHECK_USER_ID" != "$APACHE_RUN_GID_DEFAULT" ]; then
         APACHE_RUN_GID="$CHECK_GROUP_ID"
       fi
     fi
