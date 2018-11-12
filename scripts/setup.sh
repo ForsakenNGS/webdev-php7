@@ -104,8 +104,8 @@ do
   #echo "Checking permissions of $VOLUME_PATH ..."
   # Only check permissions if no userid was detected so far
   if [ ! "$APACHE_RUN_UID" ]; then
-    CHECK_USER_ID=`stat -c '%u' $1`
-    CHECK_GROUP_ID=`stat -c '%g' $1`
+    CHECK_USER_ID=`stat -c '%u' ${VOLUME_PATH}`
+    CHECK_GROUP_ID=`stat -c '%g' ${VOLUME_PATH}`
     # Skip volumes that are owned by root
     if [ "$CHECK_USER_ID" != "0" ] && [ "$CHECK_USER_ID" != "$APACHE_RUN_UID_DEFAULT" ]; then
       APACHE_RUN_UID="$CHECK_USER_ID"
