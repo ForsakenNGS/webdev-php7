@@ -111,7 +111,7 @@ do
       if [ "$CHECK_USER_ID" != "$APACHE_RUN_UID_DEFAULT" ]; then
         APACHE_RUN_UID="$CHECK_USER_ID"
         APACHE_RUN_GID="$CHECK_GROUP_ID"
-      elif [ "$CHECK_USER_ID" != "$APACHE_RUN_GID_DEFAULT" ]; then
+      elif [ "$CHECK_GROUP_ID" != "$APACHE_RUN_GID_DEFAULT" ]; then
         APACHE_RUN_GID="$CHECK_GROUP_ID"
       fi
     fi
@@ -129,10 +129,8 @@ if [ ! "$APACHE_RUN_GID" ]; then
 fi
 
 # Check if the desired user id exists
-APACHE_RUN_USER=$(getent passwd "$APACHE_RUN_UID" | cut -d: -f1)
-if [ ! "$APACHE_RUN_USER" ]; then
-  # User id not known! Update the default users id to match
-  APACHE_RUN_USER="$APACHE_RUN_USER_DEFAULT"
+if [ "$APACHE_RUN_USER" != "$PACHE_RUN_USER_DEFAULT" ]; then
+  # User id not known or user name changed! Update the default users id to match
   sed -i s/${APACHE_RUN_USER_DEFAULT}:x:[0-9]*:[0-9]*:/${APACHE_RUN_USER}:x:${APACHE_RUN_UID}:${APACHE_RUN_GID}:/ /etc/passwd
   # Update permissions for the volumes before execution
   UPDATE_PERMISSIONS="y"
@@ -142,10 +140,8 @@ elif [ "$APACHE_RUN_GID" != "$APACHE_RUN_GID_DEFAULT" ]; then
 fi
 
 # Check if the desired group id exists
-APACHE_RUN_GROUP=$(getent group "$APACHE_RUN_GID" | cut -d: -f1)
-if [ ! "$APACHE_RUN_GROUP" ]; then
+if [ "$APACHE_RUN_GROUP" != "$APACHE_RUN_GROUP_DEFAULT" ]; then
   # Group id not known! Update the default groups id to match
-  APACHE_RUN_GROUP="$APACHE_RUN_GROUP_DEFAULT"
   sed -i s/${APACHE_RUN_GROUP_DEFAULT}:x:[0-9]*:/${APACHE_RUN_GROUP}:x:${APACHE_RUN_GID}:/ /etc/group
   # Update permissions for the volumes before execution
   UPDATE_PERMISSIONS="y"
