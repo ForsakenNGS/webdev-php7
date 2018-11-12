@@ -52,8 +52,8 @@ ENV APACHE_RUN_USER_DEFAULT="www-data" \
     APACHE_RUN_GROUP_DEFAULT="www-data" \
     APACHE_RUN_GID_DEFAULT="${APACHE_RUN_GID:-1000}"
 
-RUN groupadd -g ${GROUP_ID_DEFAULT} ${GROUP_NAME_DEFAULT} && \
-    useradd -m -s /bin/bash -g ${GROUP_ID_DEFAULT} -u ${USER_ID_DEFAULT} ${USER_NAME_DEFAULT}
+RUN groupadd -g ${APACHE_RUN_GID_DEFAULT} ${APACHE_RUN_GROUP_DEFAULT} && \
+    useradd -m -s /bin/bash -g ${APACHE_RUN_GID_DEFAULT} -u ${APACHE_RUN_UID_DEFAULT} ${APACHE_RUN_USER_DEFAULT}
 
 # -----------------------------------------
 
