@@ -94,36 +94,70 @@ if [ -z ${APACHE_RUN_USER_HOME+x} ]; then
     fi
 fi
 
-# Create apache run user
-if [ ! -d "$APACHE_RUN_USER_HOME" ]; then
-    # Add group
-    if [ -z ${APACHE_RUN_GID+x} ]; then
-        groupadd $APACHE_RUN_GROUP
-    else
-        groupadd -g $APACHE_RUN_GID $APACHE_RUN_GROUP
+APACHE_RUN_UID=""
+APACHE_RUN_GID=""
+UPDATE_PERMISSIONS="n"
+VOLUME_PATHS="$APACHE_RUN_USER_HOME $DOCUMENT_ROOT"
+
+for VOLUME_PATH in $VOLUME_PATHS
+do
+  #echo "Checking permissions of $VOLUME_PATH ..."
+  # Only check permissions if no userid was detected so far
+  if [ ! "$APACHE_RUN_UID" ]; then
+    CHECK_USER_ID=`stat -c '%u' $1`
+    CHECK_GROUP_ID=`stat -c '%g' $1`
+    # Skip volumes that are owned by root
+    if [ "$CHECK_USER_ID" != "0" ] && [ "$CHECK_USER_ID" != "$APACHE_RUN_UID_DEFAULT" ]; then
+      APACHE_RUN_UID="$CHECK_USER_ID"
+      APACHE_RUN_GID="$CHECK_GROUP_ID"
     fi
-    # Create home directory
-    if [ ! -d $APACHE_RUN_USER_HOME ]; then
-        mkdir -p $APACHE_RUN_USER_HOME
-    fi
-    # Add user
-    if [ -z ${APACHE_RUN_UID+x} ]; then
-        useradd -d $APACHE_RUN_USER_HOME -g $APACHE_RUN_GID -G $APACHE_RUN_GROUP $APACHE_RUN_USER
-    else
-        useradd -d $APACHE_RUN_USER_HOME -g $APACHE_RUN_GID -u $APACHE_RUN_UID -G $APACHE_RUN_GROUP $APACHE_RUN_USER
-    fi
-    if [ ! -z ${APACHE_RUN_USER_SSH_DIR+x} ]; then
-        # Add ssh directory to user home
-        mv $APACHE_RUN_USER_SSH_DIR $APACHE_RUN_USER_HOME/.ssh
-        # Ensure correct permissions for ssh key
-        if [ -d $APACHE_RUN_USER_HOME/.ssh ]; then
-            chown -R $APACHE_RUN_USER:$APACHE_RUN_GROUP $APACHE_RUN_USER_HOME/.ssh
-            chmod 0700 $APACHE_RUN_USER_HOME/.ssh
-            chmod 0600 $APACHE_RUN_USER_HOME/.ssh/*
-        fi
-    fi
-    # Apply correct permissions to the home directory
-    chown -R $APACHE_RUN_USER:$APACHE_RUN_GROUP $APACHE_RUN_USER_HOME
+  fi
+done
+
+# Fall back to the default uid/gid if nothing non-root could be detected
+if [ ! "$APACHE_RUN_UID" ]; then
+  APACHE_RUN_UID="$APACHE_RUN_UID_DEFAULT"
+  UPDATE_PERMISSIONS="y"
+fi
+if [ ! "$APACHE_RUN_GID" ]; then
+  APACHE_RUN_GID="$APACHE_RUN_GID_DEFAULT"
+  UPDATE_PERMISSIONS="y"
+fi
+
+# Check if the desired user id exists
+APACHE_RUN_USER=$(getent passwd "$APACHE_RUN_UID" | cut -d: -f1)
+if [ ! "$APACHE_RUN_USER" ]; then
+  # User id not known! Update the default users id to match
+  APACHE_RUN_USER="$APACHE_RUN_USER_DEFAULT"
+  sed -i s/APACHE_RUN_USER:x:[0-9]*:[0-9]*:/$APACHE_RUN_USER:x:$APACHE_RUN_UID:$APACHE_RUN_GID:/ /etc/passwd
+  # Update permissions for the volumes before execution
+  UPDATE_PERMISSIONS="y"
+elif [ "$APACHE_RUN_GID" != "$APACHE_RUN_GID_DEFAULT" ]; then
+  # Default group id changed!
+  sed -i s/$APACHE_RUN_USER:x:[0-9]*:[0-9]*:/$APACHE_RUN_USER:x:$APACHE_RUN_UID:$APACHE_RUN_GID:/ /etc/passwd
+fi
+
+# Check if the desired group id exists
+APACHE_RUN_GROUP=$(getent group "$APACHE_RUN_GID" | cut -d: -f1)
+if [ ! "$APACHE_RUN_GROUP" ]; then
+  # Group id not known! Update the default groups id to match
+  APACHE_RUN_GROUP="$APACHE_RUN_GROUP_DEFAULT"
+  sed -i s/$APACHE_RUN_GROUP:x:[0-9]*:/$APACHE_RUN_GROUP:x:$APACHE_RUN_GID:/ /etc/group
+  # Update permissions for the volumes before execution
+  UPDATE_PERMISSIONS="y"
+fi
+
+echo "Detected permissions: ${APACHE_RUN_USER} / ${APACHE_RUN_GROUP} (${APACHE_RUN_UID} / ${APACHE_RUN_GID})"
+
+if [ "$UPDATE_PERMISSIONS" = "y" ]; then
+  echo -n "Updating volume permissions... "
+  for VOLUME_PATH in $VOLUME_PATHS
+  do
+    chown -R $APACHE_RUN_USER:$APACHE_RUN_GROUP "$VOLUME_PATH"
+  done
+  mkdir -p $APACHE_RUN_USER_HOME
+  chown -R $APACHE_RUN_USER:$APACHE_RUN_GROUP "$APACHE_RUN_USER_HOME"
+  echo "Done!"
 fi
 
 # Pull from git

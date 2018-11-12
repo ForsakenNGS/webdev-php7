@@ -46,6 +46,15 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 VOLUME /etc/apache2/sites-available
 VOLUME /var/www
 
+# Create default user
+ENV APACHE_RUN_USER_DEFAULT="www-data" \
+    APACHE_RUN_UID_DEFAULT="${APACHE_RUN_UID:-1000}" \
+    APACHE_RUN_GROUP_DEFAULT="www-data" \
+    APACHE_RUN_GID_DEFAULT="${APACHE_RUN_GID:-1000}"
+
+RUN groupadd -g ${GROUP_ID_DEFAULT} ${GROUP_NAME_DEFAULT} && \
+    useradd -m -s /bin/bash -g ${GROUP_ID_DEFAULT} -u ${USER_ID_DEFAULT} ${USER_NAME_DEFAULT}
+
 # -----------------------------------------
 
 ENTRYPOINT ["entrypoint.sh"]
