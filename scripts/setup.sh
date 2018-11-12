@@ -164,7 +164,7 @@ echo "EXTRA_OPTS='-l'" >> /etc/default/cron
 /etc/init.d/cron start
 /etc/init.d/anacron start
 
-if [ ! -z "$@" ]; then
+if [ "$#" -ne 0 ]; then
     # Start apache
     touch /var/log/apache2/output.log
     apache2-foreground > /var/log/apache2/output.log 2>&1 &
