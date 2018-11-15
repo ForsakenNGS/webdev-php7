@@ -160,6 +160,20 @@ if [ "$UPDATE_PERMISSIONS" = "y" ]; then
   echo "Done!"
 fi
 
+# Copy ssh key(s)
+if [ ! -z ${APACHE_RUN_USER_SSH_DIR+x} ]; then
+    # Add ssh directory to user home
+    mv $APACHE_RUN_USER_SSH_DIR $APACHE_RUN_USER_HOME/.ssh
+    # Ensure correct permissions for ssh key
+    if [ -d $APACHE_RUN_USER_HOME/.ssh ]; then
+        chown -R $APACHE_RUN_USER:$APACHE_RUN_GROUP $APACHE_RUN_USER_HOME/.ssh
+        chmod 0700 $APACHE_RUN_USER_HOME/.ssh
+        chmod 0600 $APACHE_RUN_USER_HOME/.ssh/*
+    fi
+fi
+# Apply correct permissions to the home directory
+chown -R $APACHE_RUN_USER:$APACHE_RUN_GROUP $APACHE_RUN_USER_HOME
+
 # Pull from git
 if [ ! -z ${GIT_SOURCE+x} ]; then
     if [ -z ${GIT_DIRECTORY+x} ]; then
