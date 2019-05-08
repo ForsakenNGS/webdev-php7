@@ -3,7 +3,7 @@ FROM php:7-apache
 # Install required software
 RUN apt-get update && \
     apt-get install -y ca-certificates && update-ca-certificates && \
-    apt-get install -y openssl git sudo unzip wget mysql-client libmcrypt-dev libpng-dev libxml2-dev libcurl4-openssl-dev libcurl3 libzip nano cron anacron
+    apt-get install -y openssl git sudo unzip wget mysql-client libmcrypt-dev libpng-dev libxml2-dev libcurl4-openssl-dev libcurl3 libzip-dev nano cron anacron
 
 ## Install composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
