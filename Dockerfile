@@ -13,7 +13,7 @@ RUN mv composer.phar /usr/local/bin/composer
 RUN chmod a+x /usr/local/bin/composer
 
 # Install php extensions
-RUN pecl install mcrypt-1.0.1
+RUN pecl install mcrypt-1.0.2
 RUN docker-php-ext-enable mcrypt
 RUN docker-php-ext-install -j4 pdo_mysql gd xml zip curl intl
 
